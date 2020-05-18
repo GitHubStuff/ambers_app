@@ -137,13 +137,15 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
   }
 
   Widget _jobButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 24.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, JobListScreen.route);
-        },
-        child: _iconText(context),
+    return InheritedJobBloc(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 24.0),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, JobListScreen.route);
+          },
+          child: _iconText(context),
+        ),
       ),
     );
   }

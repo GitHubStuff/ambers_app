@@ -20,7 +20,7 @@ class JobBloc extends Bloc<JobEvent, JobState> {
   }
 
   Stream<JobState> _addJob(JobModel job) async* {
-    final t = SQL.SqliteController.initialize(name: dbName);
+    final t = await SQL.SqliteController.initialize(name: dbName);
     Log.t('${t.toString()}');
     Jobs jobs = Jobs(name: job.title, description: job.description, rate: job.rateValue);
     final id = await jobs.create(link: SQL.SQLiteLink());

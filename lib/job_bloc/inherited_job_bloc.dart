@@ -6,7 +6,7 @@ class InheritedJobBloc extends InheritedWidget {
 
   InheritedJobBloc({Widget child}) : super(child: child);
 
-  static InheritedJobBloc of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<InheritedJobBloc>();
+  static InheritedJobBloc of(BuildContext context) => context.inheritFromWidgetOfExactType(InheritedJobBloc);
 
   bool updateShouldNotify(InheritedJobBloc oldWidget) => true;
 }

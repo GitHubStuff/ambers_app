@@ -16,6 +16,8 @@ class JobBloc extends Bloc<JobEvent, JobState> {
   Stream<JobState> mapEventToState(JobEvent event) async* {
     if (event is AddJobEvent) {
       yield* _addJob(event.jobModel);
+    } else if (event is LoadJobEvent) {
+      yield* _loadJobs();
     }
   }
 
@@ -34,6 +36,11 @@ class JobBloc extends Bloc<JobEvent, JobState> {
   }
 }
 
+Stream<JobState> _loadJobs() async* {
+  List<Jobs> jobs = await Jobs.read();
+  yield LoadedJobsState(jobs: jobs);
+}
+
 abstract class JobEvent extends Equatable {
   const JobEvent();
   @override
@@ -48,6 +55,11 @@ class AddJobEvent extends JobEvent {
   List<Object> get props => [jobModel];
 }
 
+class LoadJobEvent extends JobEvent {
+  const LoadJobEvent();
+}
+
+//------------------------------------------
 abstract class JobState extends Equatable {
   const JobState();
   @override
@@ -64,4 +76,11 @@ class NewJobState extends JobState {
   const NewJobState({this.jobModel});
   @override
   List<Object> get props => [jobModel];
+}
+
+class LoadedJobsState extends JobState {
+  final List<Jobs> jobs;
+  const LoadedJobsState({this.jobs});
+  @override
+  List<Object> get props => [jobs];
 }

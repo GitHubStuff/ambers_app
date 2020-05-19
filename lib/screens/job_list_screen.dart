@@ -4,6 +4,7 @@ import 'package:ambers_app/models/job_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class JobListScreen extends StatelessWidget {
   static const route = '/jobListScreen';
@@ -118,8 +119,10 @@ class JobListScreen extends StatelessWidget {
       bloc: jobBloc,
       builder: (context, JobState jobState) {
         if (jobState is NewJobState) {
+          jobBloc.add(LoadJobEvent());
           Navigator.pop(context);
           _dispose();
+          return Container();
         }
         return (jobModel == null)
             ? RaisedButton(

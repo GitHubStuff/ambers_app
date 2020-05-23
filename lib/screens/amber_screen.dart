@@ -1,8 +1,7 @@
 import 'package:after_layout/after_layout.dart';
-import 'package:ambers_app/job_bloc/inherited_job_bloc.dart';
 import 'package:ambers_app/job_bloc/job_bloc.dart';
 import 'package:ambers_app/main.dart';
-import 'package:ambers_app/models/amber_theme.dart';
+import 'package:ambers_app/models/constants.dart';
 import 'package:ambers_app/sqlite/ambers_app/table_jobs/jobs.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,46 +61,58 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
   @override
   Widget build(BuildContext context) {
     Log.t('Amber build()');
-    return InheritedJobBloc(
-      child: HudScaffold.progressText(
-        context,
-        hide: hideSpinner,
-        indicatorColors: ModeColor(light: Colors.purpleAccent, dark: Colors.purple),
-        progressText: 'Amber Showable spinner',
-        scaffold: Scaffold(
-          appBar: AppBar(
-            leading: Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  icon: _icon(context),
-                  onPressed: () {
-                    ModeTheme.of(context).toggleBrightness();
-                  },
-                  tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-                );
-              },
-            ),
-            title: Text("Amber's Timesheet"),
-            actions: <Widget>[
-              _jobButton(context),
-            ],
+    Color cardColor = ModeColor(light: Colors.grey[300], dark: Colors.grey[700]).color(context);
+    return HudScaffold.progressText(
+      context,
+      hide: hideSpinner,
+      indicatorColors: ModeColor(light: Colors.purpleAccent, dark: Colors.purple),
+      progressText: 'Amber Showable spinner',
+      scaffold: Scaffold(
+        appBar: AppBar(
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: _icon(context),
+                onPressed: () {
+                  ModeTheme.of(context).toggleBrightness();
+                },
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              );
+            },
           ),
-          body: body(),
-          floatingActionButton: FloatingActionButton(
-            heroTag: 'main',
-            onPressed: () {
-              setState(() {
-                hideSpinner = false;
-                Future.delayed(Duration(seconds: 3), () {
-                  setState(() {
-                    hideSpinner = true;
-                  });
+          title: Text("Amber's Timesheet"),
+          actions: <Widget>[
+            Theme(
+              data: Theme.of(context).copyWith(cardColor: cardColor),
+              child: PopupMenuButton(
+                itemBuilder: (context) {
+                  return Constants.mainList.map((item) {
+                    return PopupMenuItem(
+                      child: Text(item),
+                      value: item,
+                    );
+                  }).toList();
+                },
+                onSelected: (text) => _menuChoices(context, text),
+              ),
+            ),
+          ],
+        ),
+        body: body(),
+        floatingActionButton: FloatingActionButton(
+          heroTag: 'main',
+          onPressed: () {
+            setState(() {
+              hideSpinner = false;
+              Future.delayed(Duration(seconds: 3), () {
+                setState(() {
+                  hideSpinner = true;
                 });
               });
-            },
-            tooltip: 'Increment',
-            child: Icon(Icons.add),
-          ),
+            });
+          },
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
         ),
       ),
     );
@@ -124,6 +135,14 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
     Log.t('Amber dispose()');
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _menuChoices(BuildContext context, String choice) {
+    switch (choice) {
+      case Constants.newJob:
+        Navigator.pushNamed(context, JobListScreen.route);
+        break;
+    }
   }
 
   /// Scaffold body
@@ -196,20 +215,6 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
     );
   }
 
-  Widget _jobButton(BuildContext context) {
-    return InheritedJobBloc(
-      child: Padding(
-        padding: const EdgeInsets.only(right: 24.0),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(context, JobListScreen.route);
-          },
-          child: _iconText(context),
-        ),
-      ),
-    );
-  }
-
   Widget _icon(BuildContext context) {
     return Icon(
       Icons.lightbulb_outline,
@@ -218,13 +223,4 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
     );
   }
 
-  Widget _iconText(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Text(
-        'JOBS',
-        style: AmbersThemes.buttonText(context),
-      ),
-    );
-  }
 }

@@ -1,4 +1,3 @@
-import 'package:ambers_app/job_bloc/inherited_job_bloc.dart';
 import 'package:ambers_app/job_bloc/job_bloc.dart';
 import 'package:ambers_app/models/amber_theme.dart';
 import 'package:ambers_app/models/job_model.dart';
@@ -14,8 +13,9 @@ class JobListScreen extends StatelessWidget {
   final _titleController = TextEditingController();
   final _rateController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final JobBloc jobBloc;
 
-  JobListScreen({Key key, this.jobModel}) : super(key: key);
+  JobListScreen({Key key, @required this.jobModel, @required this.jobBloc}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -114,16 +114,20 @@ class JobListScreen extends StatelessWidget {
   }
 
   Widget _button(BuildContext context) {
-    final _jobBloc = InheritedJobBloc.of(context).jobBloc;
-    debugPrint('${_jobBloc.toString()}');
     return BlocBuilder(
-      bloc: _jobBloc,
+      bloc: jobBloc,
       builder: (context, JobState jobState) {
+        if (jobState is NewJobState) {
+          jobBloc.add(LoadJobEvent());
+          Navigator.pop(context);
+          _dispose();
+          return Container();
+        }
         return (jobModel == null)
             ? RaisedButton(
                 child: Text('Add', style: Theme.of(context).textTheme.headline5),
                 onPressed: () {
-                  _addAction(context, _jobBloc);
+                  _addAction(context);
                 },
               )
             : RaisedButton(
@@ -142,14 +146,12 @@ class JobListScreen extends StatelessWidget {
     _titleController.dispose();
   }
 
-  void _addAction(BuildContext context, JobBloc jobBloc) {
+  void _addAction(BuildContext context) {
     final JobModel payload = JobModel(
       description: _descriptionController.text,
       title: _titleController.text,
       rate: _rateController.text,
     );
     jobBloc.add(AddJobEvent(jobModel: payload));
-    _dispose();
-    Navigator.pop(context);
   }
 }

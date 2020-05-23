@@ -16,11 +16,13 @@ class JobBloc extends Bloc<JobEvent, JobState> {
   Stream<JobState> mapEventToState(JobEvent event) async* {
     if (event is AddJobEvent) {
       yield* _addJob(event.jobModel);
+    } else if (event is LoadJobEvent) {
+      yield* _loadJobs();
     }
   }
 
   Stream<JobState> _addJob(JobModel job) async* {
-    final t = SQL.SqliteController.initialize(name: dbName);
+    final t = await SQL.SqliteController.initialize(name: dbName);
     Log.t('${t.toString()}');
     Jobs jobs = Jobs(name: job.title, description: job.description, rate: job.rateValue);
     final id = await jobs.create(link: SQL.SQLiteLink());
@@ -32,6 +34,11 @@ class JobBloc extends Bloc<JobEvent, JobState> {
     );
     yield NewJobState(jobModel: result);
   }
+}
+
+Stream<JobState> _loadJobs() async* {
+  List<Jobs> jobs = await Jobs.read();
+  yield LoadedJobsState(jobs: jobs);
 }
 
 abstract class JobEvent extends Equatable {
@@ -48,6 +55,11 @@ class AddJobEvent extends JobEvent {
   List<Object> get props => [jobModel];
 }
 
+class LoadJobEvent extends JobEvent {
+  const LoadJobEvent();
+}
+
+//------------------------------------------
 abstract class JobState extends Equatable {
   const JobState();
   @override
@@ -64,4 +76,11 @@ class NewJobState extends JobState {
   const NewJobState({this.jobModel});
   @override
   List<Object> get props => [jobModel];
+}
+
+class LoadedJobsState extends JobState {
+  final List<Jobs> jobs;
+  const LoadedJobsState({this.jobs});
+  @override
+  List<Object> get props => [jobs];
 }

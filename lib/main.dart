@@ -7,6 +7,7 @@ import 'package:flutter_sqlite_developer/sqlite_screen_widget.dart';
 import 'job_bloc/job_bloc.dart';
 import 'models/job_model.dart';
 import 'screens/amber_screen.dart';
+import 'screens/working_screen.dart';
 
 void main() => runApp(AmberApp());
 
@@ -35,11 +36,7 @@ class AmberApp extends StatelessWidget {
                   jobBloc: jobBloc,
                   jobModel: null,
                 ),
-            // SqliteScreenWidget.route: (context) => SqliteScreenWidget(
-            //       childWidget: Amber(),
-            //       enabled: true,
-            //       sqliteIdentity: SQL.SQLiteIdentity(databaseName: 'amber.db'),
-            //     )
+            WorkingScreen.route: (context) => WorkingScreen(),
           },
           theme: theme,
           title: 'AmberApp',

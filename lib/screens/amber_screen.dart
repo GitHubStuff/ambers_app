@@ -2,6 +2,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:ambers_app/job_bloc/job_bloc.dart';
 import 'package:ambers_app/main.dart';
 import 'package:ambers_app/models/constants.dart';
+import 'package:ambers_app/screens/working_screen.dart';
 import 'package:ambers_app/sqlite/ambers_app/table_jobs/jobs.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -199,7 +200,10 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
                     color: ModeColor(light: Colors.purpleAccent, dark: Colors.purple).color(context),
                   ),
                 ),
-                onTap: () {},
+                onTap: () {
+                  final jobInfo = jobs[index];
+                  Navigator.pushNamed(context, WorkingScreen.route);
+                },
               ),
             );
           },
@@ -222,5 +226,4 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
       size: 26.0,
     );
   }
-
 }

@@ -25,9 +25,13 @@ class WorkingScreen extends StatelessWidget {
     return Center(
         child: Column(
       children: <Widget>[
-        Text(workingJob.description),
-        Text('\$${workingJob.rateString}'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(workingJob.description),
+        ),
+        Text('Rate: \$${workingJob.rateString}/HR'),
         _startShiftWidgets(context, workingJob),
+        _elapsedTimeWidget(context),
         _finishShiftWidgets(context, workingJob),
       ],
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -41,6 +45,8 @@ class WorkingScreen extends StatelessWidget {
         DateTimeInputWidget(
           pickerWidth: 300,
           dateTimeWidget: _startPicker,
+          yAdjustment: 24.0,
+          arrowAdjustment: 0.50,
         ),
       ],
     );
@@ -78,6 +84,21 @@ class WorkingScreen extends StatelessWidget {
     ));
   }
 
+  Widget _elapsedTimeWidget(BuildContext context) {
+    final double fontSize = textSizeMap[TextSizes.subtitle1];
+    return Container(
+      child: Center(
+        child: Text(
+          '---',
+          style: TextStyle(fontSize: fontSize, color: Colors.white),
+        ),
+      ),
+      color: ModeColor(light: Color(0xff259814), dark: Color(0xff0f4009)).color(context),
+      height: PickerSize.height,
+      width: PickerSize.width,
+    );
+  }
+
   Widget _finishShiftWidgets(BuildContext context, JobModel workingJob) {
     return Column(
       children: <Widget>[
@@ -85,6 +106,7 @@ class WorkingScreen extends StatelessWidget {
         DateTimeInputWidget(
           pickerWidth: 300,
           dateTimeWidget: _finishPicker,
+          arrowAdjustment: 0.20,
         ),
       ],
     );

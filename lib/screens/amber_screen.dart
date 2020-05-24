@@ -2,6 +2,7 @@ import 'package:after_layout/after_layout.dart';
 import 'package:ambers_app/job_bloc/job_bloc.dart';
 import 'package:ambers_app/main.dart';
 import 'package:ambers_app/models/constants.dart';
+import 'package:ambers_app/models/job_model.dart';
 import 'package:ambers_app/screens/working_screen.dart';
 import 'package:ambers_app/sqlite/ambers_app/table_jobs/jobs.g.dart';
 import 'package:flutter/material.dart';
@@ -99,9 +100,9 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
             ),
           ],
         ),
-        body: body(),
+        body: _body(),
         floatingActionButton: FloatingActionButton(
-          heroTag: 'main',
+          heroTag: 'amber_screen',
           onPressed: () {
             setState(() {
               hideSpinner = false;
@@ -112,7 +113,7 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
               });
             });
           },
-          tooltip: 'Increment',
+          tooltip: 'Jobs',
           child: Icon(Icons.add),
         ),
       ),
@@ -147,7 +148,7 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
   }
 
   /// Scaffold body
-  Widget body() {
+  Widget _body() {
     Log.t('Amber body()');
     return Center(
       child: Container(
@@ -173,8 +174,8 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
 
         return ListView.separated(
           itemBuilder: (context, index) {
-            final Jobs job = jobs[index];
-            final title = '\$${job.rate.toStringAsFixed(2)} ==> ${job.name}';
+            final JobModel job = JobModel.fromDB(jobs[index]);
+            final title = '\$${job.rateString} ==> ${job.title}';
             final subtitle = '${job.description}';
             final evenColor = ModeColor(
               light: Color(0xfffff0f5),
@@ -200,9 +201,17 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
                     color: ModeColor(light: Colors.purpleAccent, dark: Colors.purple).color(context),
                   ),
                 ),
-                onTap: () {
-                  final jobInfo = jobs[index];
-                  Navigator.pushNamed(context, WorkingScreen.route);
+                onTap: () async {
+                  JobModel jobInfo = JobModel.fromDB(jobs[index]);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => WorkingScreen(),
+                      settings: RouteSettings(
+                        arguments: jobInfo,
+                      ),
+                    ),
+                  );
                 },
               ),
             );

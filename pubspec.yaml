@@ -27,6 +27,9 @@ dependencies:
   flutter_sqlite_developer:
     git:
       url: https://github.com/GitHubStuff/flutter_sqlite_developer.git
+  flutter_date_time_popover:
+    git:
+      url: https://github.com/GitHubStuff/date_time_popover.git
 
 dev_dependencies:
   flutter_test:

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_date_time_popover/date_time_picker/common.dart';
 import 'package:flutter_date_time_popover/flutter_date_time_popover.dart';
 
-const Size PickerSize = Size(250, 30);
+const Size PickerSize = Size(275, 48);
 
 class WorkingScreen extends StatelessWidget {
   static const route = '/workingScreen';
@@ -27,14 +27,40 @@ class WorkingScreen extends StatelessWidget {
       children: <Widget>[
         Text(workingJob.description),
         Text('\$${workingJob.rateString}'),
+        _startShiftWidgets(context, workingJob),
+        _finishShiftWidgets(context, workingJob),
+      ],
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    ));
+  }
+
+  Widget _startShiftWidgets(BuildContext context, JobModel workingJob) {
+    return Column(
+      children: <Widget>[
         _startButton(context, workingJob),
         DateTimeInputWidget(
           pickerWidth: 300,
           dateTimeWidget: _startPicker,
-        )
+        ),
       ],
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-    ));
+    );
+  }
+
+  Widget _startPicker(BuildContext context, DateTime dateTime) {
+    final String date = (dateTime == null) ? 'Start' : formattedDate(dateTime);
+    final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime);
+    final double fontSize = textSizeMap[TextSizes.subtitle1];
+    return Container(
+      color: ModeColor(dark: Color(0xff263238), light: Colors.yellow).color(context),
+      width: PickerSize.width,
+      height: PickerSize.height,
+      child: Center(
+        child: Text(
+          '$date $time',
+          style: TextStyle(fontSize: fontSize),
+        ),
+      ),
+    );
   }
 
   Widget _startButton(BuildContext context, JobModel workingJob) {
@@ -52,13 +78,39 @@ class WorkingScreen extends StatelessWidget {
     ));
   }
 
-  Widget _startPicker(BuildContext context, DateTime dateTime) {
-    final result = dateTime ?? DateTime.now();
-    final String date = formattedDate(result);
-    final String time = formattedTime(result);
+  Widget _finishShiftWidgets(BuildContext context, JobModel workingJob) {
+    return Column(
+      children: <Widget>[
+        _finishButton(context, workingJob),
+        DateTimeInputWidget(
+          pickerWidth: 300,
+          dateTimeWidget: _finishPicker,
+        ),
+      ],
+    );
+  }
+
+  Widget _finishButton(BuildContext context, JobModel workingJob) {
+    return Container(
+        child: Column(
+      children: <Widget>[
+        RaisedButton(
+          child: Text(
+            'FINISH',
+            style: TextStyle(fontSize: 22.0),
+          ),
+          onPressed: () {},
+        )
+      ],
+    ));
+  }
+
+  Widget _finishPicker(BuildContext context, DateTime dateTime) {
+    final String date = (dateTime == null) ? 'Finish' : formattedDate(dateTime);
+    final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime);
     final double fontSize = textSizeMap[TextSizes.subtitle1];
     return Container(
-      color: ModeColor(light: Color(0xffbdbdbd), dark: Colors.yellow).color(context),
+      color: ModeColor(dark: Color(0xff263238), light: Colors.yellow).color(context),
       width: PickerSize.width,
       height: PickerSize.height,
       child: Center(
@@ -66,20 +118,6 @@ class WorkingScreen extends StatelessWidget {
           '$date $time',
           style: TextStyle(fontSize: fontSize),
         ),
-      ),
-    );
-  }
-
-  Widget _finishPicker(DateTime result) {
-    final String date = formattedDate(result);
-    final String time = formattedTime(result);
-    final double fontSize = textSizeMap[TextSizes.caption];
-    return Container(
-      width: PickerSize.width,
-      height: PickerSize.height,
-      child: Text(
-        '$date $time',
-        style: TextStyle(fontSize: fontSize),
       ),
     );
   }

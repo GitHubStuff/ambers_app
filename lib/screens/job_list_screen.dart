@@ -5,21 +5,36 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class JobListScreen extends StatelessWidget {
+class JobListScreen extends StatefulWidget {
   static const route = '/jobListScreen';
-  static const title = 'Job List';
 
   final JobModel jobModel;
-  final _titleController = TextEditingController();
-  final _rateController = TextEditingController();
-  final _descriptionController = TextEditingController();
   final JobBloc jobBloc;
 
   JobListScreen({Key key, @required this.jobModel, @required this.jobBloc}) : super(key: key);
 
   @override
+  _JobListScreen createState() => _JobListScreen();
+}
+
+class _JobListScreen extends State<JobListScreen> {
+  static const title = 'Job List';
+  final _titleController = TextEditingController();
+  final _rateController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
     return _scaffold(context);
+  }
+
+  @override
+  void dispose() {
+    _rateController.dispose();
+    _descriptionController.dispose();
+    _titleController.dispose();
+
+    super.dispose();
   }
 
   Widget _scaffold(BuildContext context) {
@@ -115,15 +130,18 @@ class JobListScreen extends StatelessWidget {
 
   Widget _button(BuildContext context) {
     return BlocBuilder(
-      bloc: jobBloc,
+      bloc: widget.jobBloc,
       builder: (context, JobState jobState) {
         if (jobState is NewJobState) {
-          jobBloc.add(LoadJobEvent());
-          Navigator.pop(context);
-          _dispose();
+          widget.jobBloc.add(LoadJobEvent());
+          // Delay needed because widget is being rebuilt and
+          // cannot be popped.
+          Future.delayed(Duration(milliseconds: 250), () {
+            Navigator.pop(context);
+          });
           return Container();
         }
-        return (jobModel == null)
+        return (widget.jobModel == null)
             ? RaisedButton(
                 child: Text('Add', style: Theme.of(context).textTheme.headline5),
                 onPressed: () {
@@ -140,18 +158,12 @@ class JobListScreen extends StatelessWidget {
     );
   }
 
-  void _dispose() {
-    _rateController.dispose();
-    _descriptionController.dispose();
-    _titleController.dispose();
-  }
-
   void _addAction(BuildContext context) {
     final JobModel payload = JobModel(
       description: _descriptionController.text,
       title: _titleController.text,
       rate: _rateController.text,
     );
-    jobBloc.add(AddJobEvent(jobModel: payload));
+    widget.jobBloc.add(AddJobEvent(jobModel: payload));
   }
 }

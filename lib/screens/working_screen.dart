@@ -1,9 +1,11 @@
 import 'package:ambers_app/models/job_model.dart';
+import 'package:ambers_app/working_bloc/bloc/working_bloc.dart';
+import 'package:ambers_app/working_bloc/inherited_work_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_time_popover/date_time_picker/common.dart';
 import 'package:flutter_date_time_popover/flutter_date_time_popover.dart';
 
-const Size PickerSize = Size(275, 48);
+const Size DateTimePickerWidgetSize = Size(275, 48);
 
 class WorkingScreen extends StatelessWidget {
   static const route = '/workingScreen';
@@ -11,31 +13,46 @@ class WorkingScreen extends StatelessWidget {
   const WorkingScreen({Key key}) : super(key: key);
 
   Widget build(BuildContext context) {
-    final JobModel workingModel = ModalRoute.of(context).settings.arguments;
+    final JobModel jobModel = ModalRoute.of(context).settings.arguments;
+    final WorkingBloc workingBloc = WorkingBloc(jobModel);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(workingModel.title),
+    return InheritedWorkBloc(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(jobModel.title),
+        ),
+        body: _body(context),
       ),
-      body: _body(context, workingModel),
+      workingBloc: workingBloc,
     );
   }
 
-  Widget _body(BuildContext context, JobModel workingJob) {
-    return Center(
-        child: Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Text(workingJob.description),
-        ),
-        Text('Rate: \$${workingJob.rateString}/HR'),
-        _startShiftWidgets(context, workingJob),
-        _elapsedTimeWidget(context),
-        _finishShiftWidgets(context, workingJob),
-      ],
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-    ));
+  Widget _body(BuildContext context) {
+    return Builder(
+      builder: (context) {
+        final WorkingBloc workingBloc = InheritedWorkBloc.of(context).workingBloc;
+        return BlocBuilder(
+          bloc: workingBloc,
+          builder: (context, workingState) {
+            return Center(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(workingBloc.jobModel.description),
+                  ),
+                  Text('Rate: \$${workingBloc.jobModel.rateString}/HR'),
+                  _startShiftWidgets(context, workingBloc.jobModel),
+                  _elapsedTimeWidget(context),
+                  _finishShiftWidgets(context, workingBloc.jobModel),
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _startShiftWidgets(BuildContext context, JobModel workingJob) {
@@ -58,8 +75,8 @@ class WorkingScreen extends StatelessWidget {
     final double fontSize = textSizeMap[TextSizes.subtitle1];
     return Container(
       color: ModeColor(dark: Color(0xff263238), light: Colors.yellow).color(context),
-      width: PickerSize.width,
-      height: PickerSize.height,
+      width: DateTimePickerWidgetSize.width,
+      height: DateTimePickerWidgetSize.height,
       child: Center(
         child: Text(
           '$date $time',
@@ -94,8 +111,8 @@ class WorkingScreen extends StatelessWidget {
         ),
       ),
       color: ModeColor(light: Color(0xff259814), dark: Color(0xff0f4009)).color(context),
-      height: PickerSize.height,
-      width: PickerSize.width,
+      height: DateTimePickerWidgetSize.height,
+      width: DateTimePickerWidgetSize.width,
     );
   }
 
@@ -133,8 +150,8 @@ class WorkingScreen extends StatelessWidget {
     final double fontSize = textSizeMap[TextSizes.subtitle1];
     return Container(
       color: ModeColor(dark: Color(0xff263238), light: Colors.yellow).color(context),
-      width: PickerSize.width,
-      height: PickerSize.height,
+      width: DateTimePickerWidgetSize.width,
+      height: DateTimePickerWidgetSize.height,
       child: Center(
         child: Text(
           '$date $time',

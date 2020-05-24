@@ -30,6 +30,9 @@ dependencies:
   flutter_date_time_popover:
     git:
       url: https://github.com/GitHubStuff/date_time_popover.git
+  dateinterval:
+    git:
+      url: https://github.com/GitHubStuff/flutter_dateinterval_package.git
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,6 @@
 import 'package:after_layout/after_layout.dart';
-import 'package:ambers_app/job_bloc/job_bloc.dart';
+import 'package:ambers_app/job_bloc/job_event.dart';
+import 'package:ambers_app/job_bloc/job_state.dart';
 import 'package:ambers_app/main.dart';
 import 'package:ambers_app/models/constants.dart';
 import 'package:ambers_app/models/job_model.dart';
@@ -153,12 +154,12 @@ class _Amber extends State<Amber> with WidgetsBindingObserver, AfterLayoutMixin<
     return Center(
       child: Container(
         height: 400,
-        child: _listView(context),
+        child: _listView(),
       ),
     );
   }
 
-  Widget _listView(BuildContext context) {
+  Widget _listView() {
     return BlocBuilder(
       bloc: jobBloc,
       builder: (context, jobState) {

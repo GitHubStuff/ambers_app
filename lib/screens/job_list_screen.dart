@@ -1,4 +1,6 @@
 import 'package:ambers_app/job_bloc/job_bloc.dart';
+import 'package:ambers_app/job_bloc/job_event.dart';
+import 'package:ambers_app/job_bloc/job_state.dart';
 import 'package:ambers_app/models/amber_theme.dart';
 import 'package:ambers_app/models/job_model.dart';
 import 'package:flutter/cupertino.dart';

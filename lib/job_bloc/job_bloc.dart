@@ -1,10 +1,11 @@
 import 'package:ambers_app/models/job_model.dart';
 import 'package:ambers_app/sqlite/ambers_app/table_jobs/jobs.g.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_project_package/tracers/tracers.dart' as Log;
 import 'package:flutter_sqlite_controller/flutter_sqlite_controller.dart' as SQL;
+
+import 'job_event.dart';
+import 'job_state.dart';
 
 class JobBloc extends Bloc<JobEvent, JobState> {
   JobModel _jobModel;
@@ -39,48 +40,4 @@ class JobBloc extends Bloc<JobEvent, JobState> {
 Stream<JobState> _loadJobs() async* {
   List<Jobs> jobs = await Jobs.read();
   yield LoadedJobsState(jobs: jobs);
-}
-
-abstract class JobEvent extends Equatable {
-  const JobEvent();
-  @override
-  List<Object> get props => [];
-}
-
-class AddJobEvent extends JobEvent {
-  final JobModel jobModel;
-  const AddJobEvent({@required this.jobModel});
-
-  @override
-  List<Object> get props => [jobModel];
-}
-
-class LoadJobEvent extends JobEvent {
-  const LoadJobEvent();
-}
-
-//------------------------------------------
-abstract class JobState extends Equatable {
-  const JobState();
-  @override
-  List<Object> get props => [];
-}
-
-class InitialJobState extends JobState {
-  final JobModel jobModel;
-  const InitialJobState(this.jobModel);
-}
-
-class NewJobState extends JobState {
-  final JobModel jobModel;
-  const NewJobState({this.jobModel});
-  @override
-  List<Object> get props => [jobModel];
-}
-
-class LoadedJobsState extends JobState {
-  final List<Jobs> jobs;
-  const LoadedJobsState({this.jobs});
-  @override
-  List<Object> get props => [jobs];
 }

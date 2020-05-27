@@ -11,13 +11,14 @@ const Size DateTimePickerWidgetSize = Size(275, 48);
 
 class WorkingScreen extends StatelessWidget {
   static const route = '/workingScreen';
+  static WorkingBloc _staticWorkingBlock;
 
   const WorkingScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final JobModel jobModel = ModalRoute.of(context).settings.arguments;
-    final WorkingBloc workingBloc = WorkingBloc(jobModel);
+    _staticWorkingBlock = WorkingBloc(jobModel);
 
     return InheritedWorkBloc(
       child: Scaffold(
@@ -26,7 +27,7 @@ class WorkingScreen extends StatelessWidget {
         ),
         body: _body(context),
       ),
-      workingBloc: workingBloc,
+      workingBloc: _staticWorkingBlock,
     );
   }
 
@@ -70,9 +71,9 @@ class WorkingScreen extends StatelessWidget {
   }
 
   Widget _startShiftWidgets(BuildContext context, Timesheet timesheet) {
-    DateTime dt = timesheet?.start;
-    final txt = (dt == null) ? 'NULL' : '${dt.toLocal().toString()} UTC:${dt.toUtc().toString()}';
-    Log.d('_startShiftWidget: Time going in-- $txt');
+    //DateTime dt = timesheet?.start;
+    //final txt = (dt == null) ? 'NULL' : '${dt.toLocal().toString()} UTC:${dt.toUtc().toString()}';
+    //Log.d('_startShiftWidget: Time going in-- $txt');
     return Column(
       children: <Widget>[
         //_startButton(context),
@@ -108,29 +109,26 @@ class WorkingScreen extends StatelessWidget {
   }
 
   Widget _startPicker(BuildContext context, DateTime dateTime, DateTimeInputState state) {
+    Log.d('_startPicker incoming state... ${state.toString()}');
     final String date = (dateTime == null) ? 'Start' : formattedDate(dateTime.toLocal());
     final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime.toLocal());
     final caption = '$date $time';
-    Log.v('_startPicker caption: $caption state:${EnumToString.parse(state)} ');
+    //Log.v('_startPicker caption: $caption state:${EnumToString.parse(state)} ');
     if (dateTime != null && state != DateTimeInputState.noChange) {
-      try {
-        final workBloc = InheritedWorkBloc.of(context).workingBloc;
-        switch (state) {
-          case DateTimeInputState.dismissed:
-            break;
-          case DateTimeInputState.displayed:
-            workBloc.add(PauseShiftTimerEvent());
-            break;
-          case DateTimeInputState.inital:
-            break;
-          case DateTimeInputState.noChange:
-            break;
-          case DateTimeInputState.userSet:
-            workBloc.add(UpdateShiftStartEvent(dateTime: dateTime.toUtc()));
-            break;
-        }
-      } catch (error) {
-        Log.e('${error.toString()}');
+      switch (state) {
+        case DateTimeInputState.dismissed:
+          _staticWorkingBlock.add(StartShiftEvent(dateTime: dateTime));
+          break;
+        case DateTimeInputState.displayed:
+          _staticWorkingBlock.add(PauseShiftTimerEvent());
+          break;
+        case DateTimeInputState.inital:
+          break;
+        case DateTimeInputState.noChange:
+          break;
+        case DateTimeInputState.userSet:
+          _staticWorkingBlock.add(UpdateShiftStartEvent(dateTime: dateTime.toUtc()));
+          break;
       }
     }
     return Container(

@@ -47,7 +47,13 @@ class WorkingScreen extends StatelessWidget {
               final hours = workingState.dateTimeIntervals.hours.toString();
               final minutes = workingState.dateTimeIntervals.minutes.toString().padLeft(2, '0');
               final seconds = workingState.dateTimeIntervals.seconds.toString().padLeft(2, '0');
-              elapsedTimeCaption = '$hours:$minutes:$seconds';
+              final JobModel jobModel = ModalRoute.of(context).settings.arguments;
+              String earned = jobModel.earnings(
+                workingState.dateTimeIntervals.hours,
+                workingState.dateTimeIntervals.minutes,
+                workingState.dateTimeIntervals.seconds,
+              );
+              elapsedTimeCaption = '$hours:$minutes:$seconds  $earned';
             }
             return Center(
               child: Column(

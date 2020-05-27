@@ -6,7 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:date_time_intervals/dateinterval.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_project_package/tracers/tracers.dart' as Log;
+//import 'package:flutter_project_package/tracers/tracers.dart' as Log;
 
 part 'working_event.dart';
 part 'working_state.dart';
@@ -55,7 +55,7 @@ class WorkingBloc extends Bloc<WorkingEvent, WorkingState> {
     );
     _timer?.cancel();
     int currentSeconds;
-    _timer = Timer.periodic(Duration(milliseconds: 10000), (Timer t) {
+    _timer = Timer.periodic(Duration(milliseconds: 900), (Timer t) {
       final currentTime = DateTime.now().toUtc();
       final calendarItems = DateTimeIntervals(
         setOfCalendarItems: {
@@ -67,8 +67,6 @@ class WorkingBloc extends Bloc<WorkingEvent, WorkingState> {
         endEvent: currentTime,
       );
       if (currentSeconds != calendarItems.seconds) {
-        //Log.w(
-        //    'BLOC:start:${dateTime.toLocal().toString()}, now: ${currentTime.toLocal().toString()} hours:${calendarItems.hours}');
         this.add(RefreshElapsedTimeEvent(
           dateTimeIntervals: calendarItems,
           timesheet: _timesheet,

@@ -5,7 +5,7 @@ import 'package:ambers_app/working_bloc/inherited_work_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_time_popover/date_time_picker/common.dart';
 import 'package:flutter_date_time_popover/flutter_date_time_popover.dart';
-import 'package:flutter_project_package/tracers/tracers.dart' as Log;
+//import 'package:flutter_project_package/tracers/tracers.dart' as Log;
 
 const Size DateTimePickerWidgetSize = Size(275, 48);
 
@@ -88,32 +88,11 @@ class WorkingScreen extends StatelessWidget {
     );
   }
 
-  Widget _startButton(BuildContext context) {
-    final workBloc = InheritedWorkBloc.of(context).workingBloc;
-    return Container(
-        child: Column(
-      children: <Widget>[
-        RaisedButton(
-          child: Text(
-            'START',
-            style: TextStyle(fontSize: 22.0),
-          ),
-          onPressed: () {
-            workBloc.add(StartShiftEvent(
-              dateTime: DateTime.now(),
-            ));
-          },
-        )
-      ],
-    ));
-  }
-
   Widget _startPicker(BuildContext context, DateTime dateTime, DateTimeInputState state) {
-    Log.d('_startPicker incoming state... ${state.toString()}');
+    //Log.v('_startPicker incoming state... ${state.toString()}');
     final String date = (dateTime == null) ? 'Start' : formattedDate(dateTime.toLocal());
     final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime.toLocal());
     final caption = '$date $time';
-    //Log.v('_startPicker caption: $caption state:${EnumToString.parse(state)} ');
     if (dateTime != null && state != DateTimeInputState.noChange) {
       switch (state) {
         case DateTimeInputState.dismissed:
@@ -159,10 +138,8 @@ class WorkingScreen extends StatelessWidget {
   }
 
   Widget _finishShiftWidgets(BuildContext context) {
-    return Container();
     return Column(
       children: <Widget>[
-        _finishButton(context),
         DateTimeInputWidget(
           pickerWidth: 300,
           dateTimeWidget: _finishPicker,
@@ -170,21 +147,6 @@ class WorkingScreen extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Widget _finishButton(BuildContext context) {
-    return Container(
-        child: Column(
-      children: <Widget>[
-        RaisedButton(
-          child: Text(
-            'FINISH',
-            style: TextStyle(fontSize: 22.0),
-          ),
-          onPressed: () {},
-        )
-      ],
-    ));
   }
 
   Widget _finishPicker(BuildContext context, DateTime dateTime, DateTimeInputState state) {

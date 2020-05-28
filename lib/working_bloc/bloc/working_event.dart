@@ -17,6 +17,18 @@ class RefreshElapsedTimeEvent extends WorkingEvent {
   List<Object> get props => [dateTimeIntervals, timesheet];
 }
 
+class EndShiftEvent extends WorkingEvent {
+  final DateTime endShiftDateTime;
+  
+  const EndShiftEvent(this.endShiftDateTime);
+  @override
+  List<Object> get props => [endShiftDateTime];
+}
+
+class RestartShiftTimerEvent extends WorkingEvent {
+  const RestartShiftTimerEvent();
+}
+
 class StartShiftEvent extends WorkingEvent {
   final DateTime dateTime;
   const StartShiftEvent({@required this.dateTime});

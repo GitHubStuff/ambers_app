@@ -35,6 +35,10 @@ class WorkingBloc extends Bloc<WorkingEvent, WorkingState> {
     } else if (event is PauseShiftTimerEvent) {
       _timer?.cancel();
       yield ShiftTimerPausedEvent();
+    } else if (event is RestartShiftTimerEvent) {
+      yield* _updateShiftStart(_timesheet.start ?? DateTime.now());
+    } else if (event is EndShiftEvent) {
+      yield* _endShift(event.endShiftDateTime);
     }
   }
 
@@ -47,32 +51,60 @@ class WorkingBloc extends Bloc<WorkingEvent, WorkingState> {
     yield ShiftStartedState(timesheet: _timesheet);
   }
 
+  Stream<WorkingState> _endShift(DateTime endDateTime) async* {
+    _timer?.cancel(); //Just good house keeping
+    _timesheet = Timesheet(
+      start: _timesheet.start,
+      jobid: jobModel.recordId,
+      rate: jobModel.rateValue,
+      finish: endDateTime,
+    );
+    final calendarItems = DateTimeIntervals(
+      setOfCalendarItems: {
+        CalendarItem.hours,
+        CalendarItem.minutes,
+        CalendarItem.seconds,
+      },
+      startEvent: _timesheet.start.toUtc(),
+      endEvent: endDateTime.toUtc(),
+    );
+    yield EndedShiftState(
+      timesheet: _timesheet,
+      intervals: calendarItems,
+    );
+  }
+
   Stream<WorkingState> _updateShiftStart(DateTime dateTime) async* {
     _timesheet = Timesheet(
       start: dateTime,
+      finish: _timesheet?.finish,
       jobid: jobModel.recordId,
       rate: jobModel.rateValue,
     );
     _timer?.cancel();
-    int currentSeconds;
-    _timer = Timer.periodic(Duration(milliseconds: 900), (Timer t) {
-      final currentTime = DateTime.now().toUtc();
-      final calendarItems = DateTimeIntervals(
-        setOfCalendarItems: {
-          CalendarItem.hours,
-          CalendarItem.minutes,
-          CalendarItem.seconds,
-        },
-        startEvent: dateTime.toUtc(),
-        endEvent: currentTime,
-      );
-      if (currentSeconds != calendarItems.seconds) {
-        this.add(RefreshElapsedTimeEvent(
-          dateTimeIntervals: calendarItems,
-          timesheet: _timesheet,
-        ));
-      }
-      currentSeconds = calendarItems.seconds;
-    });
+    if (_timesheet.finish != null) {
+      yield* _endShift(_timesheet.finish);
+    } else {
+      int currentSeconds;
+      _timer = Timer.periodic(Duration(milliseconds: 900), (Timer t) {
+        final currentTime = DateTime.now().toUtc();
+        final calendarItems = DateTimeIntervals(
+          setOfCalendarItems: {
+            CalendarItem.hours,
+            CalendarItem.minutes,
+            CalendarItem.seconds,
+          },
+          startEvent: dateTime.toUtc(),
+          endEvent: currentTime,
+        );
+        if (currentSeconds != calendarItems.seconds) {
+          this.add(RefreshElapsedTimeEvent(
+            dateTimeIntervals: calendarItems,
+            timesheet: _timesheet,
+          ));
+        }
+        currentSeconds = calendarItems.seconds;
+      });
+    }
   }
 }

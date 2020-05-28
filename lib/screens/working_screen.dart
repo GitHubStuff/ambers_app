@@ -97,6 +97,18 @@ class WorkingScreen extends StatelessWidget {
     //DateTime dt = timesheet?.start;
     //final txt = (dt == null) ? 'NULL' : '${dt.toLocal().toString()} UTC:${dt.toUtc().toString()}';
     //Log.d('_startShiftWidget: Time going in-- $txt');
+    if (timesheet == null) {
+      final color = ModeColor(dark: Colors.white30, light: Colors.black87).color(context);
+      return RaisedButton(
+        onPressed: () {
+          _staticWorkingBlock.add(UpdateShiftStartEvent(dateTime: DateTime.now().toUtc()));
+        },
+        child: Text(
+          'START SHIFT',
+          style: TextStyle(color: color),
+        ),
+      );
+    }
     return Column(
       children: <Widget>[
         //_startButton(context),
@@ -105,7 +117,7 @@ class WorkingScreen extends StatelessWidget {
           dateTimeWidget: _startPicker,
           yAdjustment: 24.0,
           arrowAdjustment: 0.50,
-          initialDateTime: timesheet?.start,
+          initialDateTime: DateTime.now(),
         ),
       ],
     );
@@ -161,15 +173,23 @@ class WorkingScreen extends StatelessWidget {
   }
 
   Widget _finishShiftWidgets(BuildContext context, Timesheet finishTimesheet) {
-    return Column(
-      children: <Widget>[
-        DateTimeInputWidget(
-          pickerWidth: 300,
-          dateTimeWidget: _finishPicker,
-          arrowAdjustment: 0.20,
-          initialDateTime: finishTimesheet?.finish,
+    if (finishTimesheet == null) {
+      final color = ModeColor(dark: Colors.white30, light: Colors.black87).color(context);
+      return RaisedButton(
+        onPressed: () {
+          _staticWorkingBlock.add(EndShiftEvent(DateTime.now().toUtc()));
+        },
+        child: Text(
+          'END SHIFT',
+          style: TextStyle(color: color),
         ),
-      ],
+      );
+    }
+    return DateTimeInputWidget(
+      pickerWidth: 300,
+      dateTimeWidget: _finishPicker,
+      arrowAdjustment: 0.20,
+      initialDateTime: DateTime.now(),
     );
   }
 

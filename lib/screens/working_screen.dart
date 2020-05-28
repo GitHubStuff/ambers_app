@@ -5,7 +5,7 @@ import 'package:ambers_app/working_bloc/inherited_work_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_time_popover/date_time_picker/common.dart';
 import 'package:flutter_date_time_popover/flutter_date_time_popover.dart';
-//import 'package:flutter_project_package/tracers/tracers.dart' as Log;
+import 'package:flutter_project_package/tracers/tracers.dart' as Log;
 
 const Size DateTimePickerWidgetSize = Size(275, 48);
 
@@ -33,6 +33,7 @@ class WorkingScreen extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     Timesheet timesheet;
+    Timesheet finalSheet;
     return Builder(
       builder: (context) {
         final WorkingBloc workingBloc = InheritedWorkBloc.of(context).workingBloc;
@@ -54,6 +55,18 @@ class WorkingScreen extends StatelessWidget {
                 workingState.dateTimeIntervals.seconds,
               );
               elapsedTimeCaption = '$hours:$minutes:$seconds  $earned';
+            } else if (workingState is EndedShiftState) {
+              timesheet = finalSheet = workingState.timesheet;
+              final hours = workingState.intervals.hours.toString();
+              final minutes = workingState.intervals.minutes.toString().padLeft(2, '0');
+              final seconds = workingState.intervals.seconds.toString().padLeft(2, '0');
+              final JobModel jobModel = ModalRoute.of(context).settings.arguments;
+              String earned = jobModel.earnings(
+                workingState.intervals.hours,
+                workingState.intervals.minutes,
+                workingState.intervals.seconds,
+              );
+              elapsedTimeCaption = 'Total: $hours:$minutes:$seconds  $earned';
             }
             return Center(
               child: Column(
@@ -65,7 +78,11 @@ class WorkingScreen extends StatelessWidget {
                   Text('Rate: \$${workingBloc.jobModel.rateString}/HR'),
                   _startShiftWidgets(context, timesheet),
                   _elapsedTimeWidget(context, elapsedTimeCaption),
-                  _finishShiftWidgets(context),
+                  Opacity(
+                    child: _finishShiftWidgets(context, finalSheet),
+                    opacity: (timesheet == null ? 0.0 : 1.0),
+                  ),
+                  _saveShift(context, finalSheet),
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
               ),
@@ -143,13 +160,14 @@ class WorkingScreen extends StatelessWidget {
     );
   }
 
-  Widget _finishShiftWidgets(BuildContext context) {
+  Widget _finishShiftWidgets(BuildContext context, Timesheet finishTimesheet) {
     return Column(
       children: <Widget>[
         DateTimeInputWidget(
           pickerWidth: 300,
           dateTimeWidget: _finishPicker,
           arrowAdjustment: 0.20,
+          initialDateTime: finishTimesheet?.finish,
         ),
       ],
     );
@@ -159,6 +177,26 @@ class WorkingScreen extends StatelessWidget {
     final String date = (dateTime == null) ? 'Finish' : formattedDate(dateTime);
     final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime);
     final double fontSize = textSizeMap[TextSizes.subtitle1];
+    Log.v('_finishPicker incoming state... ${state.toString()} time:$dateTime');
+    //if (dateTime != null && state != DateTimeInputState.noChange) {
+    switch (state) {
+      case DateTimeInputState.dismissed:
+        if (dateTime == null) {
+          _staticWorkingBlock.add(RestartShiftTimerEvent());
+        }
+        break;
+      case DateTimeInputState.displayed:
+        _staticWorkingBlock.add(PauseShiftTimerEvent());
+        break;
+      case DateTimeInputState.inital:
+        break;
+      case DateTimeInputState.noChange:
+        break;
+      case DateTimeInputState.userSet:
+        _staticWorkingBlock.add(EndShiftEvent(dateTime.toUtc()));
+        break;
+    }
+    //}
     return Container(
       color: ModeColor(dark: Color(0xff263238), light: Colors.yellow).color(context),
       width: DateTimePickerWidgetSize.width,
@@ -168,6 +206,18 @@ class WorkingScreen extends StatelessWidget {
           '$date $time',
           style: TextStyle(fontSize: fontSize),
         ),
+      ),
+    );
+  }
+
+  Widget _saveShift(BuildContext context, Timesheet timesheet) {
+    if (timesheet == null) return Container();
+    final color = ModeColor(dark: Colors.white30, light: Colors.black87).color(context);
+    return RaisedButton(
+      onPressed: () {},
+      child: Text(
+        'SAVE',
+        style: TextStyle(color: color),
       ),
     );
   }

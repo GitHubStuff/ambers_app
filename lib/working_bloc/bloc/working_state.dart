@@ -9,6 +9,14 @@ class WorkingInitial extends WorkingState {
   const WorkingInitial();
 }
 
+class EndedShiftState extends WorkingState {
+  final Timesheet timesheet;
+  final DateTimeIntervals intervals;
+  const EndedShiftState({this.timesheet, this.intervals});
+  @override
+  List<Object> get props => [timesheet];
+}
+
 class ShiftStartedState extends WorkingState {
   final Timesheet timesheet;
   const ShiftStartedState({this.timesheet});

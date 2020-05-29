@@ -5,7 +5,7 @@ import 'package:ambers_app/working_bloc/inherited_work_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_date_time_popover/date_time_picker/common.dart';
 import 'package:flutter_date_time_popover/flutter_date_time_popover.dart';
-import 'package:flutter_project_package/tracers/tracers.dart' as Log;
+//import 'package:flutter_project_package/tracers/tracers.dart' as Log;
 
 const Size DateTimePickerWidgetSize = Size(275, 48);
 
@@ -117,14 +117,14 @@ class WorkingScreen extends StatelessWidget {
           dateTimeWidget: _startPicker,
           yAdjustment: 24.0,
           arrowAdjustment: 0.50,
-          initialDateTime: DateTime.now(),
+          initialDateTime: timesheet.start.toLocal(),
         ),
       ],
     );
   }
 
   Widget _startPicker(BuildContext context, DateTime dateTime, DateTimeInputState state) {
-    //Log.v('_startPicker incoming state... ${state.toString()}');
+    //Log.v('_startPicker incoming state... ${state.toString()} dateTime:$dateTime');
     final String date = (dateTime == null) ? 'Start' : formattedDate(dateTime.toLocal());
     final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime.toLocal());
     final caption = '$date $time';
@@ -137,6 +137,7 @@ class WorkingScreen extends StatelessWidget {
           _staticWorkingBlock.add(PauseShiftTimerEvent());
           break;
         case DateTimeInputState.inital:
+          //_staticWorkingBlock.add(StartShiftEvent(dateTime: dateTime));
           break;
         case DateTimeInputState.noChange:
           break;
@@ -197,8 +198,7 @@ class WorkingScreen extends StatelessWidget {
     final String date = (dateTime == null) ? 'Finish' : formattedDate(dateTime);
     final String time = (dateTime == null) ? 'Shift' : formattedTime(dateTime);
     final double fontSize = textSizeMap[TextSizes.subtitle1];
-    Log.v('_finishPicker incoming state... ${state.toString()} time:$dateTime');
-    //if (dateTime != null && state != DateTimeInputState.noChange) {
+    //Log.v('_finishPicker incoming state... ${state.toString()} time:$dateTime');
     switch (state) {
       case DateTimeInputState.dismissed:
         if (dateTime == null) {

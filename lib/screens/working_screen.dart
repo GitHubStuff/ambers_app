@@ -41,7 +41,13 @@ class WorkingScreen extends StatelessWidget {
           bloc: workingBloc,
           builder: (context, workingState) {
             String elapsedTimeCaption;
-            if (workingState is ShiftStartedState) {
+            if (workingState is ShiftSavedState) {
+              Future.delayed(const Duration(milliseconds: 250), () {
+                Navigator.pop(context);
+              });
+
+              return Container();
+            } else if (workingState is ShiftStartedState) {
               timesheet = workingState.timesheet;
             } else if (workingState is UpdatedLapsedTimeState) {
               timesheet = workingState.timesheet;
@@ -234,7 +240,9 @@ class WorkingScreen extends StatelessWidget {
     if (timesheet == null) return Container();
     final color = ModeColor(dark: Colors.white30, light: Colors.black87).color(context);
     return RaisedButton(
-      onPressed: () {},
+      onPressed: () {
+        _staticWorkingBlock.add(SaveShiftEvent());
+      },
       child: Text(
         'SAVE',
         style: TextStyle(color: color),

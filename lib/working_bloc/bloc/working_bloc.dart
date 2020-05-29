@@ -6,7 +6,8 @@ import 'package:bloc/bloc.dart';
 import 'package:date_time_intervals/dateinterval.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_project_package/tracers/tracers.dart' as Log;
+import 'package:flutter_project_package/tracers/tracers.dart' as Log;
+import 'package:flutter_sqlite_controller/flutter_sqlite_controller.dart' as SQL;
 
 part 'working_event.dart';
 part 'working_state.dart';
@@ -39,7 +40,17 @@ class WorkingBloc extends Bloc<WorkingEvent, WorkingState> {
       yield* _updateShiftStart(_timesheet.start ?? DateTime.now());
     } else if (event is EndShiftEvent) {
       yield* _endShift(event.endShiftDateTime);
+    } else if (event is SaveShiftEvent) {
+      yield* _saveTimesheet(_timesheet);
     }
+  }
+
+  Stream<WorkingState> _saveTimesheet(Timesheet timesheet) async* {
+    final t = await SQL.SqliteController.initialize(name: dbName);
+    Log.t('(working_bloc.dart) ${t.toString()}');
+    final id = await timesheet.create(link: SQL.SQLiteLink());
+    Log.t('(working_bloc.dart) -- saved work $id');
+    yield ShiftSavedState();
   }
 
   Stream<WorkingState> _startShift(DateTime dateTime) async* {

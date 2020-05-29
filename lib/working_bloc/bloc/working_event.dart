@@ -19,7 +19,7 @@ class RefreshElapsedTimeEvent extends WorkingEvent {
 
 class EndShiftEvent extends WorkingEvent {
   final DateTime endShiftDateTime;
-  
+
   const EndShiftEvent(this.endShiftDateTime);
   @override
   List<Object> get props => [endShiftDateTime];
@@ -27,6 +27,10 @@ class EndShiftEvent extends WorkingEvent {
 
 class RestartShiftTimerEvent extends WorkingEvent {
   const RestartShiftTimerEvent();
+}
+
+class SaveShiftEvent extends WorkingEvent {
+  const SaveShiftEvent();
 }
 
 class StartShiftEvent extends WorkingEvent {

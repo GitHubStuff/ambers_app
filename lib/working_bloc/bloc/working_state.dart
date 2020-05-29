@@ -17,6 +17,10 @@ class EndedShiftState extends WorkingState {
   List<Object> get props => [timesheet];
 }
 
+class ShiftSavedState extends WorkingState {
+  const ShiftSavedState();
+}
+
 class ShiftStartedState extends WorkingState {
   final Timesheet timesheet;
   const ShiftStartedState({this.timesheet});
